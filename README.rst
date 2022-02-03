@@ -1,6 +1,12 @@
 Introduction
 ============
 
+Installation
+------------
+Install using ``pip``::
+
+   pip install talive
+
 Features
 --------
 Talive is a python library for using *Technical Analysis* in *LIVE trading*. We have the following features
