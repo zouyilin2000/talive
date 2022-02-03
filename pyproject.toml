@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "talive"
+version = "0.1.0"
+description = "Technical Analysis for LIVE trading"
+authors = ["Zou Yilin <zouyilin2@yandex.com>"]
+
+[tool.poetry.dependencies]
+python = ">= 3.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
