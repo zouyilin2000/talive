@@ -26,70 +26,70 @@ class Indicator(abc.ABC):
 
 
 class High(Indicator):
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _monotonic_queue: collections.deque[TimedFloat]
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._monotonic_queue = collections.deque()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         while (self._monotonic_queue and self._monotonic_queue[-1].value <= data.value):
             self._monotonic_queue.pop()
-        while (self._monotonic_queue and self._monotonic_queue[0].time <= data.time - self.time_period):
+        while (self._monotonic_queue and self._monotonic_queue[0].time <= data.time - self._time_period):
             self._monotonic_queue.popleft()
         return TimedFloat(data.time, self._monotonic_queue[0].value)
 
 
 class Low(Indicator):
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _monotonic_queue: collections.deque[TimedFloat]
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._monotonic_queue = collections.deque()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         while self._monotonic_queue and self._monotonic_queue[-1].value >= data.value:
             self._monotonic_queue.pop()
-        while self._monotonic_queue and self._monotonic_queue[0].time <= data.time - self.time_period:
+        while self._monotonic_queue and self._monotonic_queue[0].time <= data.time - self._time_period:
             self._monotonic_queue.popleft()
         return TimedFloat(data.time, self._monotonic_queue[0].value)
 
 
 class Sum(Indicator):
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _total: float
     _active: collections.deque
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._total = 0.
         self._active = collections.deque()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         self._active.append(data)
         self._total += data.value
-        while self._active and self._active[0].time <= data.time - self.time_period:
+        while self._active and self._active[0].time <= data.time - self._time_period:
             left = self._active.popleft()
             self._total -= left.value
         return TimedFloat(data.time, self._total)
 
 
 class MA(Indicator):
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _total: float
     _active: collections.deque
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._total = 0.
         self._active = collections.deque()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         self._active.append(data)
         self._total += data.value
-        while self._active and self._active[0].time <= data.time - self.time_period:
+        while self._active and self._active[0].time <= data.time - self._time_period:
             left = self._active.popleft()
             self._total -= left.value
         return TimedFloat(data.time, self._total / len(self._active))
@@ -97,18 +97,18 @@ class MA(Indicator):
 
 class EMA(Indicator):
     '''timeperiod: timedelta, time constant, i.e. decay to 1/e'''
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _prev: TimedFloat
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._prev = TimedFloat()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         if not self._prev:
             self._prev = data
             return self._prev
-        factor = math.exp(-(data.time - self._prev.time) / self.time_period)
+        factor = math.exp(-(data.time - self._prev.time) / self._time_period)
         value = factor * self._prev.value + (1. - factor) * data.value
         self._prev = TimedFloat(data.time, value)
         return self._prev
@@ -116,12 +116,12 @@ class EMA(Indicator):
 
 class MAD(Indicator):
     '''Mean Deviation'''
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _ma1: MA
     _ma2: MA
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._ma1 = MA(time_period)
         self._ma2 = MA(time_period)
 
@@ -133,13 +133,13 @@ class MAD(Indicator):
 
 class TR(Indicator):
     '''True range'''
-    bar_period: datetime.timedelta
+    _bar_period: datetime.timedelta
     _high: High
     _low: Low
     _prev: TimedFloat
 
     def __init__(self, bar_period: datetime.timedelta):
-        self.bar_period = bar_period
+        self._bar_period = bar_period
         self._high = High(bar_period)
         self._low = Low(bar_period)
         self._prev = TimedFloat()

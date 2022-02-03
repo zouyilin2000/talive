@@ -2,20 +2,20 @@ from basic import *
 
 
 class Aroon(Indicator):
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _high: High
     _low: Low
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._high = High(time_period)
         self._low = Low(time_period)
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         high = self._high.insert(data)
         low = self._low.insert(data)
-        aroon_up = 100. - (data.time - high.time) / self.time_period * 100.
-        aroon_down = 100. - (data.time - low.time) / self.time_period * 100.
+        aroon_up = 100. - (data.time - high.time) / self._time_period * 100.
+        aroon_down = 100. - (data.time - low.time) / self._time_period * 100.
         return TimedFloat(data.time, aroon_up - aroon_down)
 
 
@@ -53,14 +53,14 @@ class MACD_n(Indicator):  # Normalized
 
 class TRIX(Indicator):
     '''time_period: timedelta, time constant, i.e. decay to 1/e'''
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _ema1: EMA
     _ema2: EMA
     _ema3: EMA
     _prev: TimedFloat
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._ema1 = EMA(time_period)
         self._ema2 = EMA(time_period)
         self._ema3 = EMA(time_period)
@@ -80,7 +80,7 @@ class TRIX(Indicator):
 
 class TRIX_n(Indicator):
     '''time_period: timedelta, time constant, i.e. decay to 1/e'''
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _ema1: EMA
     _ema2: EMA
     _ema3: EMA
@@ -88,7 +88,7 @@ class TRIX_n(Indicator):
     _time_unit: datetime.timedelta
 
     def __init__(self, time_period: datetime.timedelta, time_unit: datetime.timedelta = datetime.timedelta(seconds=1.)):
-        self.time_period = time_period
+        self._time_period = time_period
         self._ema1 = EMA(time_period)
         self._ema2 = EMA(time_period)
         self._ema3 = EMA(time_period)
@@ -140,18 +140,18 @@ class MASS_n(Indicator):  # Normalized
 
 
 class DPO(Indicator):
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _ma: MA
     _deque: collections.deque[TimedFloat]
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._ma = MA(time_period)
         self._deque = collections.deque()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         self._deque.append(data)
-        while self._deque and self._deque[0].time < data.time - self.time_period / 2.:
+        while self._deque and self._deque[0].time < data.time - self._time_period / 2.:
             self._deque.popleft()
         mid = self._deque[0]
         ma = self._ma.insert(data)
@@ -159,18 +159,18 @@ class DPO(Indicator):
 
 
 class DPO_n(Indicator):  # Normalized
-    time_period: datetime.timedelta
+    _time_period: datetime.timedelta
     _ma: MA
     _deque: collections.deque[TimedFloat]
 
     def __init__(self, time_period: datetime.timedelta):
-        self.time_period = time_period
+        self._time_period = time_period
         self._ma = MA(time_period)
         self._deque = collections.deque()
 
     def insert(self, data: TimedFloat) -> TimedFloat:
         self._deque.append(data)
-        while self._deque and self._deque[0].time < data.time - self.time_period / 2.:
+        while self._deque and self._deque[0].time < data.time - self._time_period / 2.:
             self._deque.popleft()
         mid = self._deque[0]
         ma = self._ma.insert(data)
