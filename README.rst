@@ -45,5 +45,5 @@ Relatively fast
 
 Contributing
 ------------
-* I am not a native English speaker. I would appreciate it if you, as a native English speaker, could revise this page and future documentation to a more correct, accurate, and concise English language.
-* For any other suggestions, open a Github issue.
+* Bug fix. Tests
+* For any suggestions, please open a Github issue.
